@@ -1,0 +1,41 @@
+#!/bin/zsh
+# autor: edinei.santos
+# Recebe uma lista de projetos e atualiza as dependências snapshot (maven) entre os projetos
+# A ordem da lista deve ser dos projetos folhas para os projetos raízes
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $(basename $0) [project1] [project2] [project3]"
+    echo "Dica: A ordem da lista deve ser dos projetos folhas para os projetos raízes"
+    exit 1
+fi
+
+WORKSPACE=/opt/workspace
+
+cd $WORKSPACE
+
+# index=2
+projects=($@)
+projectsCount=$#
+
+for i in $projects; do
+    cd $i
+    # explain sed regex
+    # ^.* descarta tudo que vem antes de <version>
+    # .*$ descarta tudo que vem depois de <version>
+    snapshotVersion=$(sed -n "s/^.*<version>\(.*-SNAPSHOT\)<\/version>.*$/\1/p" pom.xml)
+    # echo "$i -> $snapshotVersion"
+    # itera sobre os projetos e troca para versão snapshot
+    for j in $(seq 1 $projectsCount); do
+        cd ..
+        project=$projects[j]
+        cd $project
+        echo "Try change $i-$snapshotVersion snapshot in $project"
+        # explain sed regex
+        # 0,/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/ -> para mudar a primeira ocorrência do pattern
+        # (<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>) -> pattern de <projeto>XX.YY</projeto>
+        # \1$snapshotVersion\3/ -> pattern de substituição <projeto>XX.YY-SNAPSHOT</projeto>
+        sed -i -r "0,/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/ s/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/\1$snapshotVersion\3/g" pom.xml
+    done;
+    # let index=${index}+1
+    cd ..
+done;
