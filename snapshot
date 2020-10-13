@@ -26,10 +26,10 @@ for i in $projects; do
         cd $j
         echo "Try change $i-$snapshotVersion in $j"
         # explain sed regex
-        # 0,/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/ -> para mudar a primeira ocorrência do pattern
-        # (<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>) -> pattern de <projeto>XX.YY</projeto>
+        # 0,/(<.*$i.*>)(.+)(<\/.*$i.*>)/ -> para mudar a primeira ocorrência do pattern
+        # (<.*$i.*>)(.+)(<\/.*$i.*>) -> pattern de <projeto>XX.YY.ZZ</projeto>
         # \1$snapshotVersion\3/ -> pattern de substituição <projeto>XX.YY-SNAPSHOT</projeto>
-        sed -i -r "0,/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/ s/(<.*$i.*>)([0-9]+\.[0-9]+)(<\/.*$i.*>)/\1$snapshotVersion\3/g" pom.xml
+        sed -i -r "0,/(<.*$i.*>)(.+)(<\/.*$i.*>)/ s/(<.*$i.*>)(.+)(<\/.*$i.*>)/\1$snapshotVersion\3/g" pom.xml
     done;
     cd ..
 done;
