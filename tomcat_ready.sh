@@ -3,7 +3,6 @@
 # script linux that notifies when tomcat is ready (started) 
 # needs curl and libnotify-bin (notifications) installed
 
-
 status_ok="200"
 
 while true
